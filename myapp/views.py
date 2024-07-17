@@ -1,34 +1,47 @@
 from django.shortcuts import render,redirect
 from myapp.models import user_data
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 
 def sign_view(request):
     if request.method=="POST":
         name=request.POST.get('username')
-        print(name)
         mail=request.POST.get('email')
         pas=request.POST.get('password')
-        user_data.objects.create(user_name=name,email=mail,password=pas)
-    context={
-        'word1':'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Debitis,ex ratione. Aliquid!',
-        'word2':'subham'
-    }
+        if name and mail and pas:
+            user= User.objects.create(
+                username = name,
+                email=mail,
+                password=pas
+            )
+            user.set_password(pas)
+            user.save()
+            messages.info(request,'account created successfully')
+            return redirect('sign_in/')
+        else:
+            messages.error(request,'Provide valid detail')
+    else:
+        messages.error(request,'Provide valid request')
+        
+    return render(request,'log.html')
 
-    return render(request,'log.html',context)
+    
 
 
 def sign_in(request):
     if request.method=='POST':
         name=request.POST.get('name_login')
         pas=request.POST.get('p_word')
-        print(name)
-        print(pas)
-        user=user_data.objects.filter(user_name=name,password=pas)
-        print(user)
+
+        user = authenticate(username=name,password=pas)
         if user.exists():
-            request.session['user']=name
-            return redirect('/')
+            login(request,user)
+
+          
         else:
             messages.error(request,"data didn't exist!")
     return render(request,'log.html',)
