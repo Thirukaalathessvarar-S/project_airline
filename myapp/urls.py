@@ -1,8 +1,8 @@
-from django.conf import settings
-from django.conf.urls.static import static
+
 from django.urls import path
 from myapp import views
 urlpatterns=[
     path('',views.index_view,name='index'),
-    path('authentication/',views.login_view,name='login')
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('authentication/',views.sign_view,name='signup'),
+    path('sign_in/',views.sign_in,name='sign_in')
+]
